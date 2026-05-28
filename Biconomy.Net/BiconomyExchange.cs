@@ -3,6 +3,8 @@ using CryptoExchange.Net.Converters;
 using CryptoExchange.Net.Converters.SystemTextJson;
 using CryptoExchange.Net.Objects;
 using CryptoExchange.Net.RateLimiting;
+using CryptoExchange.Net.RateLimiting.Filters;
+using CryptoExchange.Net.RateLimiting.Guards;
 using CryptoExchange.Net.RateLimiting.Interfaces;
 using CryptoExchange.Net.SharedApis;
 using System.Text.Json;
@@ -128,7 +130,8 @@ namespace Biconomy.Net
         private void Initialize()
         {
             Rest = new RateLimitGate("Biconomy Rest");
-            Socket = new RateLimitGate("Biconomy Socket");
+            Socket = new RateLimitGate("Biconomy Socket")
+                .AddGuard(new RateLimitGuard(RateLimitGuard.PerHost, new LimitItemTypeFilter(RateLimitItemType.Connection), 5, TimeSpan.FromSeconds(1), RateLimitWindowType.Sliding));
 
             Rest.RateLimitTriggered += x => RateLimitTriggered?.Invoke(x);
             Rest.RateLimitUpdated += x => RateLimitUpdated?.Invoke(x);
