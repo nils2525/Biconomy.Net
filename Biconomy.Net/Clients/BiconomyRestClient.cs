@@ -35,7 +35,7 @@ namespace Biconomy.Net.Clients
             : base(loggerFactory, BiconomyExchange.ExchangeName)
         {
             Initialize(options.Value);
-            SpotApi = AddApiClient(new BiconomyRestClientSpotApi(this, _logger, httpClient, options.Value));
+            SpotApi = AddApiClient(new BiconomyRestClientSpotApi(this, loggerFactory, httpClient, options.Value));
         }
         #endregion
 

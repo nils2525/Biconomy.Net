@@ -19,6 +19,12 @@ namespace Biconomy.Net
     {
         #region Statics
         internal static JsonSerializerOptions _serializerContext = SerializerOptions.WithConverters(JsonSerializerContextCache.GetOrCreate<BiconomySourceGenerationContext>());
+        internal static readonly ParameterSerializationSettings _parameterSerializationSettings = new()
+        {
+            Decimal = DecimalSerialization.String,
+            Array = ArrayParametersSerialization.MultipleValues,
+            Sort = false
+        };
         #endregion
 
         #region Properties
@@ -32,7 +38,8 @@ namespace Biconomy.Net
             "https://www.biconomy.com/",
             ["https://github.com/BiconomyOfficial/APIDocs/blob/master/README_v3.md"],
             PlatformType.CryptoCurrencyExchange,
-            CentralizationType.Centralized);
+            CentralizationType.Centralized,
+            BiconomyEnvironment.All);
 
         /// <summary>
         /// Exchange name.

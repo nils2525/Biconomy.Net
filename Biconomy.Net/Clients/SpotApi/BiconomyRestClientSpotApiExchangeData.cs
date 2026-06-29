@@ -1,7 +1,6 @@
 using Biconomy.Net.Interfaces.Clients.SpotApi;
 using Biconomy.Net.Objects.Models;
 using CryptoExchange.Net.Objects;
-using Microsoft.Extensions.Logging;
 
 namespace Biconomy.Net.Clients.SpotApi
 {
@@ -20,9 +19,8 @@ namespace Biconomy.Net.Clients.SpotApi
         /// <summary>
         /// ctor.
         /// </summary>
-        /// <param name="logger">Logger.</param>
         /// <param name="baseClient">Base client.</param>
-        public BiconomyRestClientSpotApiExchangeData(ILogger logger, BiconomyRestClientSpotApi baseClient)
+        public BiconomyRestClientSpotApiExchangeData(BiconomyRestClientSpotApi baseClient)
         {
             _baseClient = baseClient;
         }
@@ -30,36 +28,36 @@ namespace Biconomy.Net.Clients.SpotApi
 
         #region Methods
         /// <inheritdoc />
-        public async Task<WebCallResult<BiconomyServerTime>> GetServerTimeAsync(CancellationToken ct = default)
+        public async Task<HttpResult<BiconomyServerTime>> GetServerTimeAsync(CancellationToken ct = default)
         {
-            var request = _definitions.GetOrCreate(HttpMethod.Get, "/api/v3/time", BiconomyExchange.RateLimiter.Rest, 1, false);
+            var request = _definitions.GetOrCreate(HttpMethod.Get, _baseClient.BaseAddress, "/api/v3/time", BiconomyExchange.RateLimiter.Rest, 1, false);
             return await _baseClient.SendBiconomyAsync<BiconomyServerTime>(request, null, ct).ConfigureAwait(false);
         }
 
         /// <inheritdoc />
-        public async Task<WebCallResult<BiconomySymbol[]>> GetSymbolsAsync(CancellationToken ct = default)
+        public async Task<HttpResult<BiconomySymbol[]>> GetSymbolsAsync(CancellationToken ct = default)
         {
-            var request = _definitions.GetOrCreate(HttpMethod.Get, "/api/v3/symbols", BiconomyExchange.RateLimiter.Rest, 1, false);
+            var request = _definitions.GetOrCreate(HttpMethod.Get, _baseClient.BaseAddress, "/api/v3/symbols", BiconomyExchange.RateLimiter.Rest, 1, false);
             return await _baseClient.SendBiconomyAsync<BiconomySymbol[]>(request, null, ct).ConfigureAwait(false);
         }
 
         /// <inheritdoc />
-        public async Task<WebCallResult<BiconomyTicker[]>> GetTickersAsync(CancellationToken ct = default)
+        public async Task<HttpResult<BiconomyTicker[]>> GetTickersAsync(CancellationToken ct = default)
         {
-            var request = _definitions.GetOrCreate(HttpMethod.Get, "/api/v3/tickers", BiconomyExchange.RateLimiter.Rest, 1, false);
+            var request = _definitions.GetOrCreate(HttpMethod.Get, _baseClient.BaseAddress, "/api/v3/tickers", BiconomyExchange.RateLimiter.Rest, 1, false);
             return await _baseClient.SendBiconomyAsync<BiconomyTicker[]>(request, null, ct).ConfigureAwait(false);
         }
 
         /// <inheritdoc />
-        public async Task<WebCallResult<BiconomyOrderBook>> GetOrderBookAsync(string symbol, int? limit = null, CancellationToken ct = default)
+        public async Task<HttpResult<BiconomyOrderBook>> GetOrderBookAsync(string symbol, int? limit = null, CancellationToken ct = default)
         {
-            var parameters = new ParameterCollection
+            var parameters = new Parameters(BiconomyExchange._parameterSerializationSettings)
             {
                 { "symbol", symbol }
             };
-            parameters.AddOptional("limit", limit);
+            parameters.Add("limit", limit);
 
-            var request = _definitions.GetOrCreate(HttpMethod.Get, "/api/v3/depth", BiconomyExchange.RateLimiter.Rest, 1, false);
+            var request = _definitions.GetOrCreate(HttpMethod.Get, _baseClient.BaseAddress, "/api/v3/depth", BiconomyExchange.RateLimiter.Rest, 1, false);
             return await _baseClient.SendBiconomyAsync<BiconomyOrderBook>(request, parameters, ct).ConfigureAwait(false);
         }
         #endregion

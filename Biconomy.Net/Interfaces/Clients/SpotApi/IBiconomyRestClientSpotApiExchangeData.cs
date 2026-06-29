@@ -14,7 +14,7 @@ namespace Biconomy.Net.Interfaces.Clients.SpotApi
         /// </summary>
         /// <param name="ct">Cancellation token.</param>
         /// <returns>Server time.</returns>
-        Task<WebCallResult<BiconomyServerTime>> GetServerTimeAsync(CancellationToken ct = default);
+        Task<HttpResult<BiconomyServerTime>> GetServerTimeAsync(CancellationToken ct = default);
 
         /// <summary>
         /// Get exchange symbols.
@@ -22,7 +22,7 @@ namespace Biconomy.Net.Interfaces.Clients.SpotApi
         /// </summary>
         /// <param name="ct">Cancellation token.</param>
         /// <returns>Exchange symbols.</returns>
-        Task<WebCallResult<BiconomySymbol[]>> GetSymbolsAsync(CancellationToken ct = default);
+        Task<HttpResult<BiconomySymbol[]>> GetSymbolsAsync(CancellationToken ct = default);
 
         /// <summary>
         /// Get all 24h tickers.
@@ -30,7 +30,7 @@ namespace Biconomy.Net.Interfaces.Clients.SpotApi
         /// </summary>
         /// <param name="ct">Cancellation token.</param>
         /// <returns>Exchange tickers.</returns>
-        Task<WebCallResult<BiconomyTicker[]>> GetTickersAsync(CancellationToken ct = default);
+        Task<HttpResult<BiconomyTicker[]>> GetTickersAsync(CancellationToken ct = default);
 
         /// <summary>
         /// Get order book depth.
@@ -40,6 +40,6 @@ namespace Biconomy.Net.Interfaces.Clients.SpotApi
         /// <param name="limit">Optional depth limit.</param>
         /// <param name="ct">Cancellation token.</param>
         /// <returns>Order book depth.</returns>
-        Task<WebCallResult<BiconomyOrderBook>> GetOrderBookAsync(string symbol, int? limit = null, CancellationToken ct = default);
+        Task<HttpResult<BiconomyOrderBook>> GetOrderBookAsync(string symbol, int? limit = null, CancellationToken ct = default);
     }
 }

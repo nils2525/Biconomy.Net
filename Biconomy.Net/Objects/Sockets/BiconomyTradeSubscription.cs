@@ -33,7 +33,7 @@ namespace Biconomy.Net.Objects.Sockets
 
             var routes = new List<MessageRoute>();
             foreach (var symbol in symbols)
-                routes.Add(MessageRoute<BiconomyDealsUpdate>.CreateWithTopicFilter("deals.update", symbol, DoHandleMessage));
+                routes.Add(MessageRoute.CreateForEvent<BiconomyDealsUpdate>("deals.update", symbol, DoHandleMessage));
 
             MessageRouter = MessageRouter.Create(routes.ToArray());
         }
@@ -67,7 +67,7 @@ namespace Biconomy.Net.Objects.Sockets
         public CallResult DoHandleMessage(SocketConnection connection, DateTime receiveTime, string? originalData, BiconomyDealsUpdate message)
         {
             _handler.Invoke(receiveTime, originalData, message);
-            return CallResult.SuccessResult;
+            return CallResult.Ok();
         }
         #endregion
     }

@@ -41,13 +41,13 @@ namespace Biconomy.Net.Clients.SpotApi
         /// ctor.
         /// </summary>
         /// <param name="baseClient">Base client.</param>
-        /// <param name="logger">Logger.</param>
+        /// <param name="loggerFactory">Logger factory.</param>
         /// <param name="httpClient">HTTP client.</param>
         /// <param name="options">Options.</param>
-        internal BiconomyRestClientSpotApi(BiconomyRestClient baseClient, ILogger logger, HttpClient? httpClient, BiconomyRestOptions options)
-            : base(logger, httpClient, options.Environment.RestClientAddress, options, options.SpotOptions)
+        internal BiconomyRestClientSpotApi(BiconomyRestClient baseClient, ILoggerFactory? loggerFactory, HttpClient? httpClient, BiconomyRestOptions options)
+            : base(loggerFactory, BiconomyExchange.ExchangeName, httpClient, options.Environment.RestClientAddress, options, options.SpotOptions)
         {
-            ExchangeData = new BiconomyRestClientSpotApiExchangeData(logger, this);
+            ExchangeData = new BiconomyRestClientSpotApiExchangeData(this);
             StandardRequestHeaders = new Dictionary<string, string>
             {
                 { "User-Agent", "CryptoExchange.Net/" + baseClient.CryptoExchangeLibVersion }
@@ -65,17 +65,20 @@ namespace Biconomy.Net.Clients.SpotApi
             => new(credentials);
 
         /// <inheritdoc />
-        protected override Task<WebCallResult<DateTime>> GetServerTimestampAsync()
-            => Task.FromResult(new WebCallResult<DateTime>(null, null, null, null, null, null, null, null, null, null, null, ResultDataSource.Server, DateTime.UtcNow, null));
+        protected override Task<HttpResult<DateTime>> GetServerTimestampAsync()
+            => Task.FromResult(new HttpResult<DateTime>(BiconomyExchange.ExchangeName, DateTime.UtcNow, null));
 
         /// <inheritdoc />
         public override string FormatSymbol(string baseAsset, string quoteAsset, TradingMode tradingMode, DateTime? deliverDate = null)
             => BiconomyExchange.FormatSymbol(baseAsset, quoteAsset, tradingMode, deliverDate);
 
-        internal async Task<WebCallResult<T>> SendBiconomyAsync<T>(RequestDefinition definition, ParameterCollection? parameters, CancellationToken cancellationToken, int? weight = null) where T : class
+        internal async Task<HttpResult<T>> SendBiconomyAsync<T>(RequestDefinition definition, Parameters? parameters, CancellationToken cancellationToken, int? weight = null) where T : class
         {
-            var result = await base.SendAsync<BiconomyResponse<T>>(BaseAddress, definition, parameters, cancellationToken, null, weight).ConfigureAwait(false);
-            return result.As<T>(result.Data?.Data);
+            var result = await base.SendAsync<BiconomyResponse<T>>(definition, parameters, cancellationToken, null, weight).ConfigureAwait(false);
+            if (!result.Success)
+                return HttpResult.Fail<T>(result);
+
+            return HttpResult.Ok(result, result.Data.Data);
         }
         #endregion
     }

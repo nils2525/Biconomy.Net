@@ -30,7 +30,7 @@ namespace Biconomy.Net.Objects.Sockets
             _symbols = symbols;
             _handler = handler;
             IndividualSubscriptionCount = symbols.Length;
-            MessageRouter = MessageRouter.CreateWithoutTopicFilter<BiconomyStateUpdateEnvelope>("state.update", DoHandleMessage);
+            MessageRouter = MessageRouter.CreateForEvent<BiconomyStateUpdateEnvelope>("state.update", DoHandleMessage);
         }
         #endregion
 
@@ -62,7 +62,7 @@ namespace Biconomy.Net.Objects.Sockets
         public CallResult DoHandleMessage(SocketConnection connection, DateTime receiveTime, string? originalData, BiconomyStateUpdateEnvelope message)
         {
             _handler.Invoke(receiveTime, originalData, message);
-            return CallResult.SuccessResult;
+            return CallResult.Ok();
         }
         #endregion
     }

@@ -17,7 +17,7 @@ namespace Biconomy.Net.Interfaces.Clients.SpotApi
         /// <param name="onMessage">Update handler.</param>
         /// <param name="ct">Cancellation token.</param>
         /// <returns>The subscription result.</returns>
-        Task<CallResult<UpdateSubscription>> SubscribeToTickerUpdatesAsync(string[] symbols, Action<DataEvent<BiconomyStateUpdateEnvelope>> onMessage, CancellationToken ct = default);
+        Task<WebSocketResult<UpdateSubscription>> SubscribeToTickerUpdatesAsync(string[] symbols, Action<DataEvent<BiconomyStateUpdateEnvelope>> onMessage, CancellationToken ct = default);
 
         /// <summary>
         /// Subscribe to trade updates.
@@ -27,6 +27,6 @@ namespace Biconomy.Net.Interfaces.Clients.SpotApi
         /// <param name="onMessage">Update handler.</param>
         /// <param name="ct">Cancellation token.</param>
         /// <returns>The subscription result.</returns>
-        Task<CallResult<UpdateSubscription>> SubscribeToTradeUpdatesAsync(string[] symbols, Action<DataEvent<BiconomyDealsUpdate>> onMessage, CancellationToken ct = default);
+        Task<WebSocketResult<UpdateSubscription>> SubscribeToTradeUpdatesAsync(string[] symbols, Action<DataEvent<BiconomyDealsUpdate>> onMessage, CancellationToken ct = default);
     }
 }

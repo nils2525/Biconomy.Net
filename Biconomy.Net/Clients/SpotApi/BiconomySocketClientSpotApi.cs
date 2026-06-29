@@ -32,10 +32,10 @@ namespace Biconomy.Net.Clients.SpotApi
         /// <summary>
         /// ctor.
         /// </summary>
-        /// <param name="logger">Logger.</param>
+        /// <param name="loggerFactory">Logger factory.</param>
         /// <param name="options">Options.</param>
-        internal BiconomySocketClientSpotApi(ILogger logger, BiconomySocketOptions options)
-            : base(logger, options.Environment.SocketClientAddress, options, options.SpotOptions)
+        internal BiconomySocketClientSpotApi(ILoggerFactory? loggerFactory, BiconomySocketOptions options)
+            : base(loggerFactory, BiconomyExchange.ExchangeName, options.Environment.SocketClientAddress, options, options.SpotOptions)
         {
             RateLimiter = BiconomyExchange.RateLimiter.Socket;
             RegisterPeriodicQuery(
@@ -71,7 +71,7 @@ namespace Biconomy.Net.Clients.SpotApi
             => BiconomyExchange.FormatSymbol(baseAsset, quoteAsset, tradingMode, deliverDate);
 
         /// <inheritdoc />
-        public Task<CallResult<UpdateSubscription>> SubscribeToTickerUpdatesAsync(string[] symbols, Action<DataEvent<BiconomyStateUpdateEnvelope>> onMessage, CancellationToken ct = default)
+        public Task<WebSocketResult<UpdateSubscription>> SubscribeToTickerUpdatesAsync(string[] symbols, Action<DataEvent<BiconomyStateUpdateEnvelope>> onMessage, CancellationToken ct = default)
         {
             var internalHandler = new Action<DateTime, string?, BiconomyStateUpdateEnvelope>((receiveTime, originalData, data) =>
             {
@@ -87,7 +87,7 @@ namespace Biconomy.Net.Clients.SpotApi
         }
 
         /// <inheritdoc />
-        public Task<CallResult<UpdateSubscription>> SubscribeToTradeUpdatesAsync(string[] symbols, Action<DataEvent<BiconomyDealsUpdate>> onMessage, CancellationToken ct = default)
+        public Task<WebSocketResult<UpdateSubscription>> SubscribeToTradeUpdatesAsync(string[] symbols, Action<DataEvent<BiconomyDealsUpdate>> onMessage, CancellationToken ct = default)
         {
             var internalHandler = new Action<DateTime, string?, BiconomyDealsUpdate>((receiveTime, originalData, data) =>
             {

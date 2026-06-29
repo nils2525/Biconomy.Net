@@ -30,7 +30,7 @@ namespace Biconomy.Net
         /// <inheritdoc />
         public override void ProcessRequest(RestApiClient apiClient, RestRequestConfiguration requestConfig)
         {
-            if (!requestConfig.Authenticated)
+            if (!requestConfig.RequestDefinition.Authenticated)
                 return;
 
             var timestamp = GetMillisecondTimestampLong(apiClient, false).ToString(CultureInfo.InvariantCulture);

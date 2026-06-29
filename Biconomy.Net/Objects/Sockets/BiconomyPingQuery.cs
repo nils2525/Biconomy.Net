@@ -21,7 +21,7 @@ namespace Biconomy.Net.Objects.Sockets
             : base(BuildRequest(), false, 0)
         {
             RequestTimeout = TimeSpan.FromSeconds(5);
-            MessageRouter = MessageRouter.CreateWithoutTopicFilter<BiconomySocketResponse<string>>(((BiconomySocketRequest)Request).Id.ToString(), HandleMessage);
+            MessageRouter = MessageRouter.CreateForQuery<BiconomySocketResponse<string>>(((BiconomySocketRequest)Request).Id.ToString(), HandleMessage);
         }
         #endregion
 
@@ -45,9 +45,9 @@ namespace Biconomy.Net.Objects.Sockets
         public CallResult<BiconomySocketResponse<string>> HandleMessage(SocketConnection connection, DateTime receiveTime, string? originalData, BiconomySocketResponse<string> message)
         {
             if (message.ErrorMessage != null)
-                return new CallResult<BiconomySocketResponse<string>>(new ServerError(ErrorInfo.Unknown with { Message = message.ErrorMessage }));
+                return CallResult.Fail<BiconomySocketResponse<string>>(new ServerError(ErrorInfo.Unknown with { Message = message.ErrorMessage }));
 
-            return new CallResult<BiconomySocketResponse<string>>(message, originalData, null);
+            return CallResult.Ok(message, originalData);
         }
         #endregion
     }

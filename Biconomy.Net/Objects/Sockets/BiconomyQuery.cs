@@ -23,7 +23,7 @@ namespace Biconomy.Net.Objects.Sockets
         public BiconomyQuery(BiconomySocketRequest request, bool authenticated, int weight = 1)
             : base(AssignRequestId(request), authenticated, weight)
         {
-            MessageRouter = MessageRouter.CreateWithoutTopicFilter<BiconomySocketResponse<BiconomySocketStatus>>(request.Id.ToString(), HandleMessage);
+            MessageRouter = MessageRouter.CreateForQuery<BiconomySocketResponse<BiconomySocketStatus>>(request.Id.ToString(), HandleMessage);
         }
         #endregion
 
@@ -45,9 +45,9 @@ namespace Biconomy.Net.Objects.Sockets
         public CallResult<BiconomySocketResponse<BiconomySocketStatus>> HandleMessage(SocketConnection connection, DateTime receiveTime, string? originalData, BiconomySocketResponse<BiconomySocketStatus> message)
         {
             if (message.ErrorMessage != null)
-                return new CallResult<BiconomySocketResponse<BiconomySocketStatus>>(new ServerError(ErrorInfo.Unknown with { Message = message.ErrorMessage }));
+                return CallResult.Fail<BiconomySocketResponse<BiconomySocketStatus>>(new ServerError(ErrorInfo.Unknown with { Message = message.ErrorMessage }));
 
-            return new CallResult<BiconomySocketResponse<BiconomySocketStatus>>(message, originalData, null);
+            return CallResult.Ok(message, originalData);
         }
         #endregion
     }
