@@ -1,6 +1,7 @@
 using Biconomy.Net.Objects.Internal;
 using Biconomy.Net.Objects.Models;
 using Biconomy.Net.Objects.Models.Socket;
+using CryptoExchange.Net.Objects;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -32,6 +33,7 @@ namespace Biconomy.Net.Converters
     [JsonSerializable(typeof(BiconomySocketStatus))]
     [JsonSerializable(typeof(JsonElement))]
     [JsonSerializable(typeof(object[]))]
+    [JsonSerializable(typeof(Parameters))]
     [JsonSerializable(typeof(string))]
     [JsonSerializable(typeof(string[]))]
     [JsonSerializable(typeof(int))]
