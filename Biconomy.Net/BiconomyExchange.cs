@@ -138,7 +138,7 @@ namespace Biconomy.Net
         {
             Rest = new RateLimitGate("Biconomy Rest");
             Socket = new RateLimitGate("Biconomy Socket")
-                .AddGuard(new RateLimitGuard(RateLimitGuard.PerHost, new LimitItemTypeFilter(RateLimitItemType.Connection), 5, TimeSpan.FromSeconds(1), RateLimitWindowType.Sliding));
+                .AddGuard(new RateLimitGuard(RateLimitGuard.PerHost, new LimitItemTypeFilter(RateLimitItemType.Connection), 3, TimeSpan.FromSeconds(1), RateLimitWindowType.Sliding));
 
             Rest.RateLimitTriggered += x => RateLimitTriggered?.Invoke(x);
             Rest.RateLimitUpdated += x => RateLimitUpdated?.Invoke(x);
