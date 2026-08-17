@@ -137,8 +137,9 @@ namespace Biconomy.Net
         private void Initialize()
         {
             Rest = new RateLimitGate("Biconomy Rest");
+            // Multiple clients share the same IP/host limit, so connection pacing must be shared.
             Socket = new RateLimitGate("Biconomy Socket")
-                .AddGuard(new RateLimitGuard(RateLimitGuard.PerHost, new LimitItemTypeFilter(RateLimitItemType.Connection), 3, TimeSpan.FromSeconds(1), RateLimitWindowType.Sliding));
+                .AddGuard(new RateLimitGuard(RateLimitGuard.PerHost, new LimitItemTypeFilter(RateLimitItemType.Connection), 1, TimeSpan.FromSeconds(1), RateLimitWindowType.Sliding, shared: true));
 
             Rest.RateLimitTriggered += x => RateLimitTriggered?.Invoke(x);
             Rest.RateLimitUpdated += x => RateLimitUpdated?.Invoke(x);
