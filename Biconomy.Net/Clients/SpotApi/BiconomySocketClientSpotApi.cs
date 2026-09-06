@@ -13,6 +13,7 @@ using CryptoExchange.Net.Objects.Errors;
 using CryptoExchange.Net.Objects.Sockets;
 using CryptoExchange.Net.SharedApis;
 using CryptoExchange.Net.Sockets.Default;
+using CryptoExchange.Net.Sockets.Interfaces;
 using Microsoft.Extensions.Logging;
 using System.Net.WebSockets;
 
@@ -54,6 +55,44 @@ namespace Biconomy.Net.Clients.SpotApi
         #endregion
 
         #region Methods
+        private async Task RestoreHeartbeatAsync(SocketConnection connection)
+        {
+            try
+            {
+                var result = await connection.SendAndWaitQueryAsync(new BiconomyPingQuery()).ConfigureAwait(false);
+                if (!result.Success)
+                {
+                    _logger.LogWarning("[Sckt {SocketId}] Initial ping after reconnect failed: {Error}", connection.SocketId, result.Error);
+                    await connection.TriggerReconnectAsync().ConfigureAwait(false);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "[Sckt {SocketId}] Failed to initialize heartbeat after reconnect", connection.SocketId);
+            }
+        }
+
+        /// <inheritdoc />
+        protected override async Task<CallResult> ConnectSocketAsync(ISocketConnection socketConnection, CancellationToken ct)
+        {
+            var result = await base.ConnectSocketAsync(socketConnection, ct).ConfigureAwait(false);
+            if (!result.Success)
+                return result;
+
+            var connection = (SocketConnection)socketConnection;
+            // Biconomy can sweep newly opened sockets before the first periodic ping.
+            // Initialize its heartbeat immediately; subscription traffic does not do this.
+            var pingResult = await connection.SendAndWaitQueryAsync(new BiconomyPingQuery(), ct).ConfigureAwait(false);
+            if (!pingResult.Success)
+            {
+                await connection.CloseAsync().ConfigureAwait(false);
+                return CallResult.Fail(pingResult.Error!);
+            }
+
+            connection.ConnectionRestored += elapsed => _ = RestoreHeartbeatAsync(connection);
+            return result;
+        }
+
         /// <inheritdoc />
         protected override IMessageSerializer CreateSerializer()
             => new SystemTextJsonMessageSerializer(BiconomyExchange._serializerContext);
